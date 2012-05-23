@@ -48,32 +48,32 @@ module SanJuan
       namespace role do
         desc "Start god"
         task :start, :roles => role do
-          run "bundle exec god -c #{san_juan.configuration_path(current_path, role)}"
+          bundle_exec "god -c #{san_juan.configuration_path(current_path, role)}"
         end
 
         desc "Start god interactively"
         task :start_interactive, :roles => role do
-          run "bundle exec god -c #{san_juan.configuration_path(current_path, role)} -D"
+          bundle_exec "god -c #{san_juan.configuration_path(current_path, role)} -D"
         end
 
         desc "Reload the god config file"
         task :reload, :roles => role do
-          run "bundle exec god load #{san_juan.configuration_path(current_path, role)}"
+          bundle_exec "god load #{san_juan.configuration_path(current_path, role)}"
         end
 
         desc "Quit god, but not the processes it's monitoring"
         task :quit, :roles => role do
-          run 'bundle exec god quit'
+          bundle_exec 'god quit'
         end
 
         desc "Terminate god and all monitored processes"
         task :terminate, :roles => role do
-          run 'bundle exec god terminate'
+          bundle_exec 'god terminate'
         end
 
         desc "Describe the status of the running tasks"
         task :status, :roles => role do
-          run 'bundle exec god status'
+          bundle_exec 'god status'
         end
 
         watches.each do |watch|
@@ -81,7 +81,7 @@ module SanJuan
             %w(start restart stop unmonitor remove log).each do |command|
               desc "#{command.capitalize} #{watch}"
               task command, :roles => role do
-                run "bundle exec god #{command} #{watch}"
+                bundle_exec "god #{command} #{watch}"
               end
             end
           end
@@ -94,6 +94,10 @@ module SanJuan
 
   def configuration_path(current_path, role)
     fetch(:god_config_path, nil) || "#{current_path}/config/god/#{role}.god"
+  end
+  
+  def bundle_exec(command)
+    run "cd #{current_path} && bundle exec #{command}"
   end
 
 end
